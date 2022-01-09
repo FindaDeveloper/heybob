@@ -53,9 +53,7 @@ const filteraSwitch = document.getElementById('switchToFromInput');
 const filterbSwitch = document.getElementById('switchTypeInput');
 const filtercSwitch = document.getElementById('switchUserTypesInput');
 
-filteraSwitch.checked = (listType === 'to' ) ? true : false;;
-filterbSwitch.checked = (scoreType === 'inc' ) ? true : false;
-filtercSwitch.checked = (userType === 'member' ) ? true : false;
+filteraSwitch.checked = (listType === 'to' ) ? true : false;
 
 async function fetcher (type, {username,listType, scoreType}) {
     switch (type) {
