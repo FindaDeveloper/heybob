@@ -48,38 +48,27 @@ const giveBurritos = async (giver: string, updates: Updates[]) => {
 
 const notifyUser = (user: string, message: string) => Wbc.sendDM(user, message);
 
-const handleBurritos = async (giver: string, updates: Updates[]) => {
-    if (enableDecrement) {
-        const burritos = await BurritoStore.givenBurritosToday(giver, 'from');
-        const diff = dailyCap - burritos;
-        if (updates.length > diff) {
-            notifyUser(giver, `${updates.length}개의 :rice:을 주려고 했지만! ${diff}개의 :rice: 밖에 남지 않았어요 ㅠㅠ :sob:`);
-            return false;
-        }
-        if (burritos >= dailyCap) {
-            return false;
-        }
-        await giveBurritos(giver, updates);
-    } else {
-        const givenBurritos = await BurritoStore.givenToday(giver, 'from', 'inc');
-        const givenRottenBurritos = await BurritoStore.givenToday(giver, 'from', 'dec');
-        const incUpdates = updates.filter((x) => x.type === 'inc');
-        const decUpdates = updates.filter((x) => x.type === 'dec');
-        const diffInc = dailyCap - givenBurritos;
-        const diffDec = dailyDecCap - givenRottenBurritos;
-        if (incUpdates.length) {
-            if (incUpdates.length > diffInc) {
-                notifyUser(giver, `${updates.length}개의 :rice:을 주려고 했지만! ${diffInc}개의 :rice:밖에 남지 않았어요 ㅠㅠ :sob:`);
+const handleRices = async (giver: string, updates: Updates[]) => {
+    const givenRices = await BurritoStore.givenToday(giver, 'from', 'inc');
+    const diffInc = dailyCap - givenRices;
+
+    if (updates.length) {
+        if (updates.length > diffInc) {
+            notifyUser(giver, `${updates.length}개의 :rice:을 주려고 했지만! ${diffInc}개의 :rice: 밖에 남지 않았어요 ㅠㅠ :sob:`);
+        } else {
+            const userNames = [...new Set(updates.map((e) => e.username))];
+            const riceCount = updates.filter(e => e.username == userNames[0]).length;
+            userNames.forEach((name) => {
+                notifyUser(giver, `<@${giver}>님이 ${riceCount}개의 :rice:을 보내셨습니다!!`); // TODO giver -> name
+            });
+
+            if (userNames.length == 1) {
+                notifyUser(giver, `<@${userNames[0]}>님에게 ${riceCount}개의 밥을 보냈습니다!`)
             } else {
-                await giveBurritos(giver, incUpdates);
+                notifyUser(giver, `${userNames.map((e) => `<@${e}>`).join(', ')} 님에게 각각 ${riceCount}개의 밥을 보냈습니다!`);
             }
-        }
-        if (decUpdates.length) {
-            if (decUpdates.length > diffDec) {
-                notifyUser(giver, `You are trying to give away ${updates.length} rottenburritos, but you only have ${diffDec} rottenburritos left today!`);
-            } else {
-                await giveBurritos(giver, decUpdates);
-            }
+            
+            await giveBurritos(giver, updates);
         }
     }
     return true;
@@ -95,7 +84,7 @@ const start = () => {
                 if (result) {
                     const { giver, updates } = result;
                     if (updates.length) {
-                        await handleBurritos(giver, updates);
+                        await handleRices(giver, updates);
                     }
                 }
             }
@@ -104,7 +93,7 @@ const start = () => {
 };
 
 export {
-    handleBurritos,
+    handleRices,
     notifyUser,
     start,
 };
