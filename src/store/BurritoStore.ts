@@ -19,6 +19,7 @@ interface GetUserStats {
     received: number;
     given: number;
     receivedToday: number;
+    receivedFindToday: Find[],
     givenToday: number;
 }
 
@@ -59,16 +60,19 @@ class BurritoStore extends EventEmitter {
             received,
             given,
             receivedToday,
+            receivedFindToday,
             givenToday,
-        ]: [Sum[], Sum[], number, number] = await Promise.all([
+        ]: [Sum[], Sum[], number, Find[], number] = await Promise.all([
             this.database.getScore(user, 'to'),
             this.database.getScore(user, 'from'),
             this.givenBurritosToday(user, 'to'),
+            this.givenRiceFindToday(user, 'to'),
             this.givenBurritosToday(user, 'from'),
         ]);
         return {
             receivedToday,
             givenToday,
+            receivedFindToday,
             _id: user,
             received: received.length,
             given: given.length,
@@ -86,6 +90,11 @@ class BurritoStore extends EventEmitter {
     async givenBurritosToday(user: string, listType: string): Promise<number> {
         const givenToday: Find[] = await this.database.findFromToday(user, listType);
         return givenToday.length;
+    }
+
+    async givenRiceFindToday(user: string, listType: string): Promise<Find[]> {
+        const givenToday: Find[] = await this.database.findFromToday(user, listType);
+        return givenToday;
     }
 
     /**

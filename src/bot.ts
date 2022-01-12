@@ -63,17 +63,34 @@ const handleRices = async (giver: string, updates: Updates[]) => {
                 notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보내려고 했지만, 오늘은 :rice:이 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
             }
         } else {
-            userNames.forEach((name) => {
-                notifyUser(giver, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO giver -> name
-            });
+            const alreadySentUserNames = [];
+            for (const name of userNames) {
+                const stats = await BurritoStore.getUserStats(name);
+                
+                console.log(`stats: ${JSON.stringify(stats)}`);
 
-            if (userNames.length == 1) {
-                notifyUser(giver, `<@${userNames[0]}>님에게 :rice:을 보냈습니다!`);
-            } else {
-                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보냈습니다!`);
+                const sameGiverStatsToday = stats.receivedFindToday.filter(e => e.from == giver);
+                if (sameGiverStatsToday.length > 0) {
+                    notifyUser(giver, `오늘은 이미 <@${name}>님에게 :rice:을 보내셨습니다!`);
+                    alreadySentUserNames.push(name);
+                } else {
+                    notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO 전송 대상자를 giver -> name로 변경
+                }
             }
-            
-            await giveBurritos(giver, updates);
+
+            const finalGivesUserNames = userNames.filter(e => !alreadySentUserNames.includes(e));
+            const joinedFinalGivesUserNames = finalGivesUserNames.map((e) => `<@${e}>`).join(', ');
+
+            if (finalGivesUserNames.length == 0) {
+                return false;
+            } else if (finalGivesUserNames.length == 1) {
+                notifyUser(giver, `<@${finalGivesUserNames[0]}>님에게 :rice:을 보냈습니다!`);
+            } else {
+                notifyUser(giver, `${joinedFinalGivesUserNames} 님에게 :rice:을 보냈습니다!`);
+            }
+
+            const finalUpdates = updates.filter(e => finalGivesUserNames.includes(e.username));
+            await giveBurritos(giver, finalUpdates);
         }
     }
     return true;
