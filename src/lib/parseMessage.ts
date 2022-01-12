@@ -52,8 +52,7 @@ function parseMessage(msg, emojis) {
 
     if (hits.length === 0) return false;
 
-    // For each emojiHits give each user a update
-    hits.map((x) => users.forEach((u) => updates.push({ username: u, type: x.type })));
+    users.forEach((u) => updates.push({ username: u, type: 'inc' }));
 
     return {
         updates,

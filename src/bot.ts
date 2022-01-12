@@ -52,20 +52,25 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     const givenRices = await BurritoStore.givenToday(giver, 'from', 'inc');
     const diffInc = dailyCap - givenRices;
 
+    const userNames = [...new Set(updates.map((e) => e.username))];
+    const joinedUserNames = userNames.map((e) => `<@${e}>`).join(', ');
+
     if (updates.length) {
         if (updates.length > diffInc) {
-            notifyUser(giver, `${updates.length}개의 :rice:을 주려고 했지만! ${diffInc}개의 :rice: 밖에 남지 않았어요 ㅠㅠ :sob:`);
+            if (userNames.length == 1) {
+                notifyUser(giver, `<@${giver}>님에게 :rice:을 보내려고 했지만, 오늘은 :rice:이 하나도 남지 않았어요 ㅠㅠ :sob:`);
+            } else {
+                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보내려고 했지만, 오늘은 :rice:이 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
+            }
         } else {
-            const userNames = [...new Set(updates.map((e) => e.username))];
-            const riceCount = updates.filter(e => e.username == userNames[0]).length;
             userNames.forEach((name) => {
-                notifyUser(giver, `<@${giver}>님이 ${riceCount}개의 :rice:을 보내셨습니다!!`); // TODO giver -> name
+                notifyUser(giver, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO giver -> name
             });
 
             if (userNames.length == 1) {
-                notifyUser(giver, `<@${userNames[0]}>님에게 ${riceCount}개의 밥을 보냈습니다!`)
+                notifyUser(giver, `<@${userNames[0]}>님에게 :rice:을 보냈습니다!`);
             } else {
-                notifyUser(giver, `${userNames.map((e) => `<@${e}>`).join(', ')} 님에게 각각 ${riceCount}개의 밥을 보냈습니다!`);
+                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보냈습니다!`);
             }
             
             await giveBurritos(giver, updates);
