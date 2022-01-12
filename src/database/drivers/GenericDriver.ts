@@ -76,6 +76,18 @@ class GenericDriver extends Store implements Driver {
         return filteredData;
     }
 
+    async findFromThisMonth(user: string, listType: string): Promise<Find[]> {
+        this.syncData();
+        const data: any = await this.getData();
+        const filteredData = data.filter((item) => {
+            if (item[listType] === user && item.given_at.getMonth() == (new Date()).getMonth()) {
+                return item;
+            }
+            return undefined;
+        }).filter((y) => y);
+        return filteredData;
+    }
+
     async getScoreBoard({ user, listType, today }): Promise<Sum[]> {
         this.syncData();
         const data: any = await this.getData();

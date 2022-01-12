@@ -113,6 +113,11 @@ class BurritoStore extends EventEmitter {
         return givenToday.length;
     }
 
+    async givenThisMonth(user: string, listType: string): Promise<number> {
+        const givenThisMonth: Find[] = await this.database.findFromThisMonth(user, listType);
+        return givenThisMonth.length;
+    }
+
     /**
      * @param {string} user - userId
      */

@@ -49,8 +49,10 @@ const giveBurritos = async (giver: string, updates: Updates[]) => {
 const notifyUser = (user: string, message: string) => Wbc.sendDM(user, message);
 
 const handleRices = async (giver: string, updates: Updates[]) => {
-    const givenRices = await BurritoStore.givenToday(giver, 'from', 'inc');
+    const givenRices = await BurritoStore.givenThisMonth(giver, 'from');
+    console.log(`givenRices = ${givenRices}`);
     const diffInc = dailyCap - givenRices;
+    console.log(`diffInc = ${diffInc}`);
 
     const userNames = [...new Set(updates.map((e) => e.username))];
     const joinedUserNames = userNames.map((e) => `<@${e}>`).join(', ');
@@ -58,9 +60,9 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     if (updates.length) {
         if (updates.length > diffInc) {
             if (userNames.length == 1) {
-                notifyUser(giver, `<@${giver}>님에게 :rice:을 보내려고 했지만, 오늘은 :rice:이 하나도 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `<@${giver}>님에게 :rice:을 보내려고 했지만, 이번달엔 :rice:이 하나도 남지 않았어요 ㅠㅠ :sob:`);
             } else {
-                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보내려고 했지만, 오늘은 :rice:이 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보내려고 했지만, 이번달엔 :rice:이 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
             }
         } else {
             const alreadySentUserNames = [];
@@ -74,7 +76,7 @@ const handleRices = async (giver: string, updates: Updates[]) => {
                     notifyUser(giver, `오늘은 이미 <@${name}>님에게 :rice:을 보내셨습니다!`);
                     alreadySentUserNames.push(name);
                 } else {
-                    notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO 전송 대상자를 giver -> name로 변경
+                    // notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO 전송 대상자를 giver -> name로 변경
                 }
             }
 
