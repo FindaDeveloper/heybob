@@ -55,7 +55,8 @@ class BurritoStore extends EventEmitter {
         return to;
     }
 
-    async getUserStats(user: string): Promise<GetUserStats> {
+    async getUserStats(user: string, timesType: string): Promise<GetUserStats> {
+        console.log(`store timesType: ${timesType}`);
         const [
             received,
             given,
@@ -63,8 +64,8 @@ class BurritoStore extends EventEmitter {
             receivedFindToday,
             givenToday,
         ]: [Sum[], Sum[], number, Find[], number] = await Promise.all([
-            this.database.getScore(user, 'to'),
-            this.database.getScore(user, 'from'),
+            this.database.getScore(user, 'to', timesType),
+            this.database.getScore(user, 'from', timesType),
             this.givenBurritosToday(user, 'to'),
             this.givenRiceFindToday(user, 'to'),
             this.givenBurritosToday(user, 'from'),
@@ -80,6 +81,7 @@ class BurritoStore extends EventEmitter {
     }
 
     async getScoreBoard({ ...args }): Promise<DatabasePost[]> {
+        console.log(args);
         return this.database.getScoreBoard({ ...args });
     }
 

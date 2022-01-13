@@ -17,8 +17,8 @@ const {
  * @param {string} scoretype - inc / dec
  * @param {string} listType - to / from
  */
-const getScoreBoard = async (listType: string, scoreType: string) => {
-    const data = await BurritoStore.getScoreBoard({ listType, scoreType });
+const getScoreBoard = async (listType: string, scoreType: string, timesType: string) => {
+    const data = await BurritoStore.getScoreBoard({ listType, scoreType, timesType });
     const score = [];
     const uniqueUsername = [...new Set(data.map((x) => x[listType]))];
 
@@ -81,7 +81,7 @@ const _getUserScoreBoard = async ({ ...args }) => {
 /**
  * @param {string} user - Slack userId
  */
-const getUserStats = async (user: string) => {
+const getUserStats = async (user: string, timesType: string) => {
     const [
         userStats,
         givenList,
@@ -89,7 +89,7 @@ const getUserStats = async (user: string) => {
         givenListToday,
         receivedListToday,
     ] = await Promise.all([
-        BurritoStore.getUserStats(user),
+        BurritoStore.getUserStats(user, timesType),
         _getUserScoreBoard({ user, listType: 'to' }),
         _getUserScoreBoard({ user, listType: 'from' }),
         _getUserScoreBoard({ user, listType: 'to', today: true }),

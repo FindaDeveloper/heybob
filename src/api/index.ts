@@ -19,6 +19,12 @@ const ALLOWED_SCORETYPES: string[] = [
     'dec',
 ];
 
+const ALLOWED_TIMES: string[] = [
+    'thismonth',
+    'pastmonth',
+    'every'
+]
+
 /**
  * http response function
  * @param { object } content
@@ -69,12 +75,14 @@ Route.add({
 
 Route.add({
     method: 'GET',
-    path: `${apiPath}scoreboard/{listType}/{scoreTypeInput}`,
+    path: `${apiPath}scoreboard/{listType}/{scoreTypeInput}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { listType, scoreTypeInput } = request.params;
+            const { listType, scoreTypeInput, time } = request.params;
 
             const scoreType = scoreTypeInput || 'inc';
+            const timeType = time || 'thismonth';
+            console.log(timeType);
 
             if (!ALLOWED_LISTTYPES.includes(listType)) {
                 throw ({
@@ -90,7 +98,14 @@ Route.add({
                 });
             }
 
-            const score = await getScoreBoard(listType, scoreType);
+            if (!ALLOWED_TIMES.includes(timeType)) {
+                throw ({
+                    message: 'Allowed times is thismonth or pastmonth or every',
+                    code: 400,
+                });
+            }
+
+            const score = await getScoreBoard(listType, scoreType, timeType);
 
             const data = {
                 error: false,
@@ -144,7 +159,7 @@ Route.add({
             }
 
             const { ...result } = await getUserScore(userId, listType, scoreType);
-
+            
             const data = {
                 error: false,
                 code: 200,
@@ -172,11 +187,14 @@ Route.add({
  */
 Route.add({
     method: 'GET',
-    path: `${apiPath}userstats/{user}`,
+    path: `${apiPath}userstats/{user}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { user: userId } = request.params;
+            const { user: userId, time } = request.params;
 
+            console.log(`time=${time}`);
+            const timesType = time || 'thismonth';
+            
             if (!userId) {
                 throw ({
                     message: 'You must provide slack userid',
@@ -184,7 +202,7 @@ Route.add({
                 });
             }
 
-            const { ...result } = await getUserStats(userId);
+            const { ...result } = await getUserStats(userId, timesType);
 
             const data = {
                 error: false,

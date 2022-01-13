@@ -48,22 +48,35 @@ const burritoHost = window.location.hostname;
 let listType = getLocalStorage('listType') || 'to';
 let scoreType = getLocalStorage('scoreType') || 'inc';
 let userType = getLocalStorage('userType') || 'member';
+let timeType = getLocalStorage('time') || 'thismonth';
 
 const filteraSwitch = document.getElementById('switchToFromInput');
-const filterbSwitch = document.getElementById('switchTypeInput');
-const filtercSwitch = document.getElementById('switchUserTypesInput');
 
 filteraSwitch.checked = (listType === 'to' ) ? true : false;
 
-async function fetcher (type, {username,listType, scoreType}) {
+const timeSelect = document.getElementById('timeSelect');
+
+timeSelect.value = timeType;
+
+timeSelect.addEventListener('change', async (event) => {
+    const value =  event.target.value;
+    timeType = value;
+    setLocalStorage('time', value);
+
+    store = await fetcher('scoreboard', { listType, scoreType, timeType });
+    sortUsers();
+    render();
+});
+
+async function fetcher (type, {username,listType, scoreType, timeType}) {
     switch (type) {
     case 'scoreboard':
-        const res = await fetch(`/api/scoreboard/${listType}/${scoreType}`);
+        const res = await fetch(`/api/scoreboard/${listType}/${scoreType}/${timeType}`);
         const json = await res.json();
         return json.data;
         break;
     case 'userStats':
-        const res1 = await fetch(`/api/userstats/${username}`);
+        const res1 = await fetch(`/api/userstats/${username}/${timeType}`);
         const json1 = await res1.json();
         return json1.data;
         break;
@@ -78,44 +91,22 @@ async function fetcher (type, {username,listType, scoreType}) {
 };
 
 const getScoreBoard = async() => {
-    store = await fetcher('scoreboard',{listType, scoreType});
+    store = await fetcher('scoreboard',{listType, scoreType, timeType});
     sortUsers();
     render();
 };
 
 getScoreBoard();
 
-
-
 filteraSwitch.addEventListener('click', async (ev) => {
     const list = (listType === 'to') ? 'from' : 'to';
     listType = list;
     setLocalStorage('listType',list);
 
-    store = await fetcher('scoreboard',{listType, scoreType});
+    store = await fetcher('scoreboard',{listType, scoreType, timeType});
     sortUsers();
     render();
 });
-
-filterbSwitch.addEventListener('click', async (ev) => {
-    const score = (scoreType === 'inc') ? 'dec' : 'inc';
-    scoreType = score;
-    setLocalStorage('scoreType',score);
-    store = await fetcher('scoreboard',{listType, scoreType});
-    sortUsers();
-    render();
-});
-
-filtercSwitch.addEventListener('click', async (ev) => {
-    const memberType = (userType === 'member') ? 'all' : 'member';
-    userType = memberType;
-    setLocalStorage('userType',memberType);
-    store = await fetcher('scoreboard',{listType, scoreType});
-    sortUsers();
-    render();
-});
-
-
 
 function sortUsers(sort = false) {
 
@@ -164,7 +155,7 @@ async function displayStats(data, element) {
         statsEl.style.cssText = 'height: 0px';
         statsEl.classList.remove('display');
     } else {
-        const res = await fetcher("userStats", {username: data.username});
+        const res = await fetcher("userStats", {username: data.username, timeType: timeType});
         addStats(res);
     }
 }

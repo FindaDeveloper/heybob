@@ -51,10 +51,31 @@ class GenericDriver extends Store implements Driver {
         return Promise.resolve(true);
     }
 
-    async getScore(user: string, listType: string, num = false): Promise<number | Find[]> {
+    async getScore(user: string, listType: string, timesType: string, num = false): Promise<number | Find[]> {
+        console.log(`timesType: ${timesType}`);
         this.syncData();
         const data: any = await this.getData();
-        const filteredData = data.filter((item: any) => item[listType] === user);
+        const filteredData = data.filter((item: any) => {
+            if (item[listType] === user) {
+                if (timesType == 'thismonth') {
+                    if (item.given_at.getMonth() == new Date().getMonth()) {
+                        return item;
+                    }
+                } else if (timesType == 'pastmonth') {
+                    let pastMonth = new Date().getMonth();
+                    if (pastMonth == 0) {
+                        pastMonth = 12;
+                    }
+
+                    if (item.given_at.getMonth() == (pastMonth - 1)) {
+                        return item;
+                    }
+                }else {
+                    return item;
+                }
+            }
+            return undefined;
+        }).map(y => y);
         if (num) {
             const score: number = filteredData.reduce((a: number, item: any) => a + item.value, 0);
             return Promise.resolve(score);
@@ -88,9 +109,10 @@ class GenericDriver extends Store implements Driver {
         return filteredData;
     }
 
-    async getScoreBoard({ user, listType, today }): Promise<Sum[]> {
+    async getScoreBoard({ user, listType, timesType }): Promise<Sum[]> {
         this.syncData();
         const data: any = await this.getData();
+        const timeType = timesType || 'thismonth';
 
         let listTypeSwitch: string;
         if (user) {
@@ -99,19 +121,39 @@ class GenericDriver extends Store implements Driver {
             listTypeSwitch = listType;
         }
         const selected = data.filter((item: any) => {
-            if (today) {
-                if (item.given_at.getTime() < time().end.getTime()
-                    && item.given_at.getTime() > time().start.getTime()) {
+            if (timeType == 'thismonth') {
+                if (item.given_at.getMonth() == new Date().getMonth()) {
                     if (user) {
-                        if (item[listTypeSwitch] === user) return item;
+                        if (item[listTypeSwitch] === user) {
+                            return item;
+                        }
                     } else {
-                        return item;
+                        return item
                     }
                 }
-            } else if (user) {
-                if (item[listTypeSwitch] === user) return item;
+            } else if (timeType == 'pastmonth') {
+                var pastMonth = new Date().getMonth();
+                if (pastMonth == 0) {
+                    pastMonth = 12;
+                }
+                
+                if (item.given_at.getMonth() == (pastMonth - 1)) {
+                    if (user) {
+                        if (item[listTypeSwitch] === user) {
+                            return item;
+                        }
+                    } else {
+                        return item
+                    }
+                }
             } else {
-                return item;
+                if (user) {
+                    if (item[listTypeSwitch] === user) {
+                        return item;
+                    }
+                } else {
+                    return item
+                }
             }
             return undefined;
         }).filter((y: any) => y);
