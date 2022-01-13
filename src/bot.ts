@@ -67,7 +67,7 @@ const handleRices = async (giver: string, updates: Updates[]) => {
         } else {
             const alreadySentUserNames = [];
             for (const name of userNames) {
-                const stats = await BurritoStore.getUserStats(name);
+                const stats = await BurritoStore.getUserStats(name, 'thismonth');
                 
                 console.log(`stats: ${JSON.stringify(stats)}`);
 
