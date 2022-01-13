@@ -76,7 +76,7 @@ const handleRices = async (giver: string, updates: Updates[]) => {
                     notifyUser(giver, `오늘은 이미 <@${name}>님에게 :rice:을 보내셨습니다!`);
                     alreadySentUserNames.push(name);
                 } else {
-                    // notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); // TODO 전송 대상자를 giver -> name로 변경
+                    notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); 
                 }
             }
 
