@@ -65,10 +65,19 @@ body {
     width: auto;
     margin-top:2px;
     margin-right: 5%;
+    display: inline-flex;
 }
 
 #filter p {
     display:inline;
+}
+
+select {
+    --switch-height: 35px;
+    --switch-handle-size: calc(var(--switch-height) - 6px);
+    height: 35px;
+    margin-right: 12px;
+    
 }
 
 .c-switch {
