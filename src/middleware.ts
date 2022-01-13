@@ -90,8 +90,8 @@ const getUserStats = async (user: string, timesType: string) => {
         receivedListToday,
     ] = await Promise.all([
         BurritoStore.getUserStats(user, timesType),
-        _getUserScoreBoard({ user, listType: 'to' }),
-        _getUserScoreBoard({ user, listType: 'from' }),
+        _getUserScoreBoard({ user, listType: 'to', timesType }),
+        _getUserScoreBoard({ user, listType: 'from', timesType }),
         _getUserScoreBoard({ user, listType: 'to', today: true }),
         _getUserScoreBoard({ user, listType: 'from', today: true }),
     ]);
@@ -126,8 +126,8 @@ const givenBurritosToday = async (user: string) => {
 /**
  * @param {string} user - Slack userId
  */
-const getUserScore = async (user: string, listType: string, scoreType: string) => {
-    const scoreList = await BurritoStore.getScoreBoard({ listType, scoreType });
+const getUserScore = async (user: string, listType: string, scoreType: string, timesType: string) => {
+    const scoreList = await BurritoStore.getScoreBoard({ listType, scoreType, timesType });
     const userScore = scoreList.filter((x) => x[listType] === user);
 
     const scoreTypeFilter = (scoreType === 'inc') ? 1 : -1;

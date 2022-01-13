@@ -132,10 +132,11 @@ Route.add({
  */
 Route.add({
     method: 'GET',
-    path: `${apiPath}userscore/{user}/{listType}/{scoreType}`,
+    path: `${apiPath}userscore/{user}/{listType}/{scoreType}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { user: userId, listType, scoreType } = request.params;
+            const { user: userId, listType, scoreType, time } = request.params;
+            const timesType = time || 'thismonth';
 
             if (!userId) {
                 throw ({
@@ -158,7 +159,7 @@ Route.add({
                 });
             }
 
-            const { ...result } = await getUserScore(userId, listType, scoreType);
+            const { ...result } = await getUserScore(userId, listType, scoreType, timesType);
             
             const data = {
                 error: false,
