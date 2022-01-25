@@ -60,9 +60,9 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     if (updates.length) {
         if (updates.length > diffInc) {
             if (userNames.length == 1) {
-                notifyUser(giver, `<@${giver}>님에게 :rice:을 보내려고 했지만, 이번달엔 :rice:이 하나도 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `<@${userNames[0]}>님에게 :coffee:를 보내려고 했지만, 이번달엔 :coffee:가 하나도 남지 않았어요 ㅠㅠ :sob:`);
             } else {
-                notifyUser(giver, `${joinedUserNames} 님에게 :rice:을 보내려고 했지만, 이번달엔 :rice:이 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `${joinedUserNames} 님에게 :coffee:를 보내려고 했지만, 이번달엔 :coffee:가 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
             }
         } else {
             const alreadySentUserNames = [];
@@ -73,10 +73,10 @@ const handleRices = async (giver: string, updates: Updates[]) => {
 
                 const sameGiverStatsToday = stats.receivedFindToday.filter(e => e.from == giver);
                 if (sameGiverStatsToday.length > 0) {
-                    notifyUser(giver, `오늘은 이미 <@${name}>님에게 :rice:을 보내셨습니다!`);
+                    notifyUser(giver, `오늘은 이미 <@${name}>님에게 :coffee:를 보내셨습니다!`);
                     alreadySentUserNames.push(name);
                 } else {
-                    notifyUser(name, `<@${giver}>님이 :rice:을 보내셨습니다!!`); 
+                    notifyUser(name, `<@${giver}>님이 :coffee:를 보내셨습니다!!`); 
                 }
             }
 
@@ -86,9 +86,9 @@ const handleRices = async (giver: string, updates: Updates[]) => {
             if (finalGivesUserNames.length == 0) {
                 return false;
             } else if (finalGivesUserNames.length == 1) {
-                notifyUser(giver, `<@${finalGivesUserNames[0]}>님에게 :rice:을 보냈습니다!`);
+                notifyUser(giver, `<@${finalGivesUserNames[0]}>님에게 :coffee:를 보냈습니다!`);
             } else {
-                notifyUser(giver, `${joinedFinalGivesUserNames} 님에게 :rice:을 보냈습니다!`);
+                notifyUser(giver, `${joinedFinalGivesUserNames} 님에게 :coffee:를 보냈습니다!`);
             }
 
             const finalUpdates = updates.filter(e => finalGivesUserNames.includes(e.username));
