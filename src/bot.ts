@@ -55,6 +55,12 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     console.log(`diffInc = ${diffInc}`);
 
     const userNames = [...new Set(updates.map((e) => e.username))];
+
+    if (userNames.length > 1) {
+        notifyUser(giver, `죄송하지만 한번에 한분까지만 :coffee:를 보낼 수 있어요 :sob: \n메세지를 삭제한 후 다시 시도해주세요!`);
+        return;
+    }
+
     const joinedUserNames = userNames.map((e) => `<@${e}>`).join(', ');
 
     if (updates.length) {
