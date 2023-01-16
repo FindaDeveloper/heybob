@@ -48,7 +48,7 @@ const giveBurritos = async (giver: string, updates: Updates[]) => {
 
 const notifyUser = (user: string, message: string) => Wbc.sendDM(user, message);
 
-const handleRices = async (giver: string, updates: Updates[]) => {
+const handleRices = async (giver: string, updates: Updates[], emoji: string) => {
     const givenRices = await BurritoStore.givenThisMonth(giver, 'from');
     console.log(`givenRices = ${givenRices}`);
     const diffInc = dailyCap - givenRices;
@@ -57,7 +57,7 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     const userNames = [...new Set(updates.map((e) => e.username))];
 
     if (userNames.length > 1) {
-        notifyUser(giver, `죄송하지만 한번에 한분까지만 :coffee:를 보낼 수 있어요 :sob: \n메세지를 삭제한 후 다시 시도해주세요!`);
+        notifyUser(giver, `죄송하지만 한번에 한분까지만 ${emoji}를 보낼 수 있어요 :sob: \n메세지를 삭제한 후 다시 시도해주세요!`);
         return;
     }
 
@@ -66,9 +66,9 @@ const handleRices = async (giver: string, updates: Updates[]) => {
     if (updates.length) {
         if (updates.length > diffInc) {
             if (userNames.length == 1) {
-                notifyUser(giver, `<@${userNames[0]}>님에게 :coffee:를 보내려고 했지만, 이번달엔 :coffee:가 하나도 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `<@${userNames[0]}>님에게 ${emoji}를 보내려고 했지만, 이번달엔 ${emoji}가 하나도 남지 않았어요 ㅠㅠ :sob:`);
             } else {
-                notifyUser(giver, `${joinedUserNames} 님에게 :coffee:를 보내려고 했지만, 이번달엔 :coffee:가 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
+                notifyUser(giver, `${joinedUserNames} 님에게 ${emoji}를 보내려고 했지만, 이번달엔 ${emoji}가 ${diffInc}밖에 남지 않았어요 ㅠㅠ :sob:`);
             }
         } else {
             const alreadySentUserNames = [];
@@ -79,10 +79,10 @@ const handleRices = async (giver: string, updates: Updates[]) => {
 
                 const sameGiverStatsToday = stats.receivedFindToday.filter(e => e.from == giver);
                 if (sameGiverStatsToday.length > 0) {
-                    notifyUser(giver, `오늘은 이미 <@${name}>님에게 :coffee:를 보내셨습니다!`);
+                    notifyUser(giver, `오늘은 이미 <@${name}>님에게 ${emoji}를 보내셨습니다!`);
                     alreadySentUserNames.push(name);
                 } else {
-                    notifyUser(name, `<@${giver}>님이 :coffee:를 보내셨습니다!!`); 
+                    notifyUser(name, `<@${giver}>님이 ${emoji}를 보내셨습니다!!`); 
                 }
             }
 
@@ -92,9 +92,9 @@ const handleRices = async (giver: string, updates: Updates[]) => {
             if (finalGivesUserNames.length == 0) {
                 return false;
             } else if (finalGivesUserNames.length == 1) {
-                notifyUser(giver, `<@${finalGivesUserNames[0]}>님에게 :coffee:를 보냈습니다!`);
+                notifyUser(giver, `<@${finalGivesUserNames[0]}>님에게 ${emoji}를 보냈습니다!`);
             } else {
-                notifyUser(giver, `${joinedFinalGivesUserNames} 님에게 :coffee:를 보냈습니다!`);
+                notifyUser(giver, `${joinedFinalGivesUserNames} 님에게 ${emoji}를 보냈습니다!`);
             }
 
             const finalUpdates = updates.filter(e => finalGivesUserNames.includes(e.username));
@@ -112,9 +112,9 @@ const start = () => {
             } else {
                 const result = parseMessage(event, emojis);
                 if (result) {
-                    const { giver, updates } = result;
+                    const { giver, updates, emoji } = result;
                     if (updates.length) {
-                        await handleRices(giver, updates);
+                        await handleRices(giver, updates, emoji);
                     }
                 }
             }

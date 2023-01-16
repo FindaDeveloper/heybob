@@ -57,6 +57,7 @@ function parseMessage(msg, emojis) {
     return {
         updates,
         giver: msg.user,
+        emoji: hits[0].emoji
     };
 }
 
