@@ -1,6 +1,6 @@
 import log from 'bog';
 import Route from './Route';
-import { getScoreBoard, getUserStats, givenBurritosToday, getUserScore } from '../middleware';
+import {getScoreBoard, getUserStats, givenBurritosToday, getUserScore} from '../middleware';
 import config from '../config';
 
 // Types
@@ -32,8 +32,13 @@ const ALLOWED_TIMES: string[] = [
  * @params { number } statuscode
  */
 const response = (content: Http.Response, res: any, statusCode: number = 200): void => {
-    res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+    res.writeHead(statusCode, {'Content-Type': 'application/json'});
     res.end(JSON.stringify(content), 'utf-8');
+};
+
+const csvResponse = (content: string, res: any, statusCode: number = 200): void => {
+    res.writeHead(statusCode, {'Content-Type': 'text/csv'});
+    res.end(content, 'utf-8');
 };
 
 Route.add({
@@ -41,7 +46,7 @@ Route.add({
     path: `${apiPath}userstats/today/{user}`,
     handler: async (request: any, res: any) => {
         try {
-            const { user } = request.params;
+            const {user} = request.params;
             if (!user) {
                 throw ({
                     message: 'You must provide slack userid',
@@ -72,13 +77,12 @@ Route.add({
 });
 
 
-
 Route.add({
     method: 'GET',
     path: `${apiPath}scoreboard/{listType}/{scoreTypeInput}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { listType, scoreTypeInput, time } = request.params;
+            const {listType, scoreTypeInput, time} = request.params;
 
             const scoreType = scoreTypeInput || 'inc';
             const timeType = time || 'thismonth';
@@ -135,7 +139,7 @@ Route.add({
     path: `${apiPath}userscore/{user}/{listType}/{scoreType}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { user: userId, listType, scoreType, time } = request.params;
+            const {user: userId, listType, scoreType, time} = request.params;
             const timesType = time || 'thismonth';
 
             if (!userId) {
@@ -159,8 +163,8 @@ Route.add({
                 });
             }
 
-            const { ...result } = await getUserScore(userId, listType, scoreType, timesType);
-            
+            const {...result} = await getUserScore(userId, listType, scoreType, timesType);
+
             const data = {
                 error: false,
                 code: 200,
@@ -191,11 +195,11 @@ Route.add({
     path: `${apiPath}userstats/{user}/{time}`,
     handler: async (request: any, res: any) => {
         try {
-            const { user: userId, time } = request.params;
+            const {user: userId, time} = request.params;
 
             console.log(`time=${time}`);
             const timesType = time || 'thismonth';
-            
+
             if (!userId) {
                 throw ({
                     message: 'You must provide slack userid',
@@ -203,7 +207,7 @@ Route.add({
                 });
             }
 
-            const { ...result } = await getUserStats(userId, timesType);
+            const {...result} = await getUserStats(userId, timesType);
 
             const data = {
                 error: false,
@@ -257,10 +261,23 @@ Route.add({
     },
 });
 
+Route.add({
+    method: 'GET',
+    path: `${apiPath}/statistic.csv`,
+    handler: async (req: any, res: any) => {
+        const { date } = req.params;
+        log.info(`date: ${date}`);
+        const result = 'Year,Make,Model\n' +
+            '1997,Ford,E350\n' +
+            '2000,Mercury,Cougar';
+        return csvResponse(result, res);
+    }
+})
+
 export default (req: any, res: any) => {
     const method: string = req.method.toLowerCase();
     const path: string = req.url;
-    const { route, request, error } = Route.check({ method, path, req });
-    if (error) return response({ error: true }, res, 500);
+    const {route, request, error} = Route.check({method, path, req});
+    if (error) return response({error: true}, res, 500);
     return route.handler(request, res);
 };
