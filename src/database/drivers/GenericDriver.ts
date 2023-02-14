@@ -15,6 +15,8 @@ interface Find {
     from: string;
     value: number;
     given_at: Date;
+
+    emoji: string | undefined;
 }
 
 interface Sum {
@@ -27,13 +29,14 @@ class GenericDriver extends Store implements Driver {
         super(driver);
     }
 
-    async give(to: string, from: string, date: any): Promise<any> {
+    async give(to: string, from: string, emoji: string, date: any): Promise<any> {
         const score: Score = {
             _id: id(),
             to,
             from,
             value: 1,
             given_at: date,
+            emoji
         };
         await this.storeData(score);
         return Promise.resolve(true);
@@ -46,6 +49,7 @@ class GenericDriver extends Store implements Driver {
             from,
             value: -1,
             given_at: date,
+            emoji: ''
         };
         await this.storeData(score);
         return Promise.resolve(true);
@@ -136,7 +140,7 @@ class GenericDriver extends Store implements Driver {
                 if (pastMonth == 0) {
                     pastMonth = 12;
                 }
-                
+
                 if (item.given_at.getMonth() == (pastMonth - 1)) {
                     if (user) {
                         if (item[listTypeSwitch] === user) {

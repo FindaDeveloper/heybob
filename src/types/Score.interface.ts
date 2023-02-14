@@ -4,4 +4,6 @@ export default interface Score {
     from:string;
     value:number;
     given_at:Date;
+
+    emoji: string | undefined
 }

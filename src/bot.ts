@@ -34,11 +34,11 @@ if (!disableEmojiDec) {
     decEmojis.forEach((emoji: string) => emojis.push({ type: 'dec', emoji }));
 }
 
-const giveBurritos = async (giver: string, updates: Updates[]) => {
+const giveBurritos = async (giver: string, emoji: string, updates: Updates[]) => {
     return updates.reduce(async (prev: any, burrito) => {
         return prev.then(async () => {
             if (burrito.type === 'inc') {
-                await BurritoStore.giveBurrito(burrito.username, giver);
+                await BurritoStore.giveBurrito(burrito.username, giver, emoji);
             } else if (burrito.type === 'dec') {
                 await BurritoStore.takeAwayBurrito(burrito.username, giver);
             }
@@ -74,7 +74,7 @@ const handleRices = async (giver: string, updates: Updates[], emoji: string) => 
             const alreadySentUserNames = [];
             for (const name of userNames) {
                 const stats = await BurritoStore.getUserStats(name, 'thismonth');
-                
+
                 console.log(`stats: ${JSON.stringify(stats)}`);
 
                 const sameGiverStatsToday = stats.receivedFindToday.filter(e => e.from == giver);
@@ -82,7 +82,7 @@ const handleRices = async (giver: string, updates: Updates[], emoji: string) => 
                     notifyUser(giver, `오늘은 이미 <@${name}>님에게 ${emoji}를 보내셨습니다!`);
                     alreadySentUserNames.push(name);
                 } else {
-                    notifyUser(name, `<@${giver}>님이 ${emoji}를 보내셨습니다!!`); 
+                    notifyUser(name, `<@${giver}>님이 ${emoji}를 보내셨습니다!!`);
                 }
             }
 
@@ -98,7 +98,7 @@ const handleRices = async (giver: string, updates: Updates[], emoji: string) => 
             }
 
             const finalUpdates = updates.filter(e => finalGivesUserNames.includes(e.username));
-            await giveBurritos(giver, finalUpdates);
+            await giveBurritos(giver, emoji, finalUpdates);
         }
     }
     return true;
