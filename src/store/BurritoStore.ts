@@ -23,12 +23,14 @@ interface GetUserStats {
     givenToday: number;
 }
 
-interface DatabasePost {
+export interface DatabasePost {
     _id: string,
     to: string,
     from: string,
     value: number,
-    given_at: Date
+    given_at: Date,
+
+    emoji: string | undefined
 }
 
 class BurritoStore extends EventEmitter {

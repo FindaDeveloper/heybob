@@ -1,6 +1,6 @@
 import log from 'bog';
 import Route from './Route';
-import {getScoreBoard, getUserStats, givenBurritosToday, getUserScore} from '../middleware';
+import {getScoreBoard, getUserStats, givenBurritosToday, getUserScore, getStatistic} from '../middleware';
 import config from '../config';
 
 // Types
@@ -265,11 +265,7 @@ Route.add({
     method: 'GET',
     path: `${apiPath}/statistic.csv`,
     handler: async (req: any, res: any) => {
-        const { date } = req.params;
-        log.info(`date: ${date}`);
-        const result = 'Year,Make,Model\n' +
-            '1997,Ford,E350\n' +
-            '2000,Mercury,Cougar';
+        const result = await getStatistic();
         return csvResponse(result, res);
     }
 })

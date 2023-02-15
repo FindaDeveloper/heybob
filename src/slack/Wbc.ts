@@ -1,11 +1,15 @@
 import * as log from 'bog';
 import config from '../config';
 
-interface WbcParsed {
-    id: string;
-    name: string;
-    avatar: string;
-    memberType: string;
+export interface WbcParsed {
+    id: string | undefined;
+    name: string | undefined;
+    avatar: string | undefined;
+    memberType: string | undefined;
+
+    email: string | undefined;
+
+    phone: string | undefined;
 }
 
 class Wbc {
@@ -29,9 +33,11 @@ class Wbc {
                 name: x.is_bot ? x.name : x.real_name,
                 memberType: x.is_restricted ? 'guest' : 'member',
                 avatar: x.profile.image_48,
+                email: x.profile.email,
+                phone: x.profile.phone
             });
         });
-        return { users, bots };
+        return {users, bots};
     }
 
     async sendDM(username: string, text: string) {

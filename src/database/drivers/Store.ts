@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import config from '../../config';
+import * as log from 'bog';
 
 export default class Store {
     dbPath: string;
