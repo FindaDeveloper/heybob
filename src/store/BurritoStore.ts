@@ -43,7 +43,7 @@ class BurritoStore extends EventEmitter {
 
     async giveBurrito(to: string, from: string, emoji: string, date = new Date()): Promise<string> {
         log.info(`Burrito given to ${to} from ${from}`);
-        await this.database.give(to, from, date, emoji);
+        await this.database.give(to, from, emoji, date);
         this.emit('GIVE', to, from);
         return to;
     }
